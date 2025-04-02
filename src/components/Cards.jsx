@@ -1,13 +1,15 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const endpoint = "http://127.0.0.1:8000/api/auth/subjects";
 const token = localStorage.getItem("token");
 
 const Cards = () => {
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true); // Estado de carga
-    const [error, setError] = useState(null); // Estado para manejar errores
+    const [loading, setLoading] = useState(true); 
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,7 +36,8 @@ const Cards = () => {
     }, []); 
 
     const handleClick = (id) => {
-        alert(`Card ${id} clickeada!`);
+        // alert(`Card ${id} clickeada`);
+        navigate(`/maestro/clase/${id}`)
     };
 
     if (error) {

@@ -46,7 +46,7 @@ function Login() {
                 console.log(response);
                 navigate("/maestro/home");
             } else if (role === 2) {
-                navigate("/maestro/home");
+                navigate("/alumno/home");
             }
         } catch (error) {
             alert(error);
