@@ -6,6 +6,7 @@ import Navbarmaestro from "./layouts/Navbarmaestro";
 import Cards from "./components/Cards";
 import CrearClase from "./pages/maestro/CrearClase";
 import ClaseEspecifica from "./pages/maestro/ClaseEspecifica";
+import DropdownOpcionesClase from "./components/DropdownOpcionesClase";
 
 function App() {
   return (
@@ -19,8 +20,17 @@ function App() {
           <Route
             path="/maestro/home"
             element={
-              <Navbarmaestro>
-                <Cards></Cards>
+              <Navbarmaestro
+                actionComponent={
+                  <a
+                    href="/maestro/crear-clase"
+                    className="btn btn-outline-success"
+                  >
+                    + Crear Nueva Clase
+                  </a>
+                }
+              >
+                <Cards />
               </Navbarmaestro>
             }
           />
@@ -37,7 +47,11 @@ function App() {
           <Route
             path="/maestro/clase/:id"
             element={
-              <Navbarmaestro>
+              <Navbarmaestro
+                actionComponent={
+                  <DropdownOpcionesClase></DropdownOpcionesClase>
+                }
+              >
                 <ClaseEspecifica></ClaseEspecifica>
               </Navbarmaestro>
             }
