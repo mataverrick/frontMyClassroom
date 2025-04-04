@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navbarmaestro from "./layouts/Navbarmaestro";
 import Cards from "./components/Cards";
 import CrearClase from "./pages/maestro/CrearClase";
-import ClaseEspecifica from "./pages/maestro/ClaseEspecifica";
+import TablonPrincipalMaestro from "./pages/maestro/TablonPrincipalMaestro";
 import DropdownOpcionesClase from "./components/DropdownOpcionesClase";
 
 function App() {
@@ -52,7 +52,7 @@ function App() {
                   <DropdownOpcionesClase></DropdownOpcionesClase>
                 }
               >
-                <ClaseEspecifica></ClaseEspecifica>
+                <TablonPrincipalMaestro></TablonPrincipalMaestro>
               </Navbarmaestro>
             }
           ></Route>

@@ -6,49 +6,44 @@ const DropdownOpcionesClase = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalAlumnosOpen, setIsModalAlumnosOpen] = useState(false);
+  const [isModalAvisoOpen, setIsModalAvisoOpen] = useState(false); // <-- NUEVO
+  const [mensajeAviso, setMensajeAviso] = useState(""); // <-- NUEVO
+
   const [alumnos, setAlumnos] = useState([]);
   const [selectedAlumno, setSelectedAlumno] = useState(null);
   const [alumnosClase, setAlumnosClase] = useState([]);
 
   const { id } = useParams();
 
-  // Obtener alumnos disponibles para inscripción
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
       .get("http://127.0.0.1:8000/api/auth/subject/users/1", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => setAlumnos(response.data.users || []))
       .catch((error) => console.error("Error al obtener alumnos:", error));
   }, []);
 
-  // Obtener alumnos inscritos en la clase seleccionada
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
       .get(`http://127.0.0.1:8000/api/auth/subject/users/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => setAlumnosClase(response.data.users || []))
-      .catch((error) => console.error("Error al obtener alumnos de la clase:", error));
+      .catch((error) =>
+        console.error("Error al obtener alumnos de la clase:", error)
+      );
   }, [id]);
 
-  // Agregar alumno a la clase
   const handleAgregarAlumno = () => {
     if (!selectedAlumno) return;
     const token = localStorage.getItem("token");
     axios
       .post(
         "http://127.0.0.1:8000/api/teacher/subject/users",
-        {
-          subject: id,
-          users: [selectedAlumno],
-        },
+        { subject: id, users: [selectedAlumno] },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,15 +54,36 @@ const DropdownOpcionesClase = () => {
       .then(() => {
         alert("Alumno agregado exitosamente");
         setIsModalOpen(false);
-        // Actualizar lista de alumnos de la clase
-        return axios.get(`http://127.0.0.1:8000/api/auth/subject/users/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        return axios.get(
+          `http://127.0.0.1:8000/api/auth/subject/users/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
       })
       .then((response) => setAlumnosClase(response.data.users || []))
       .catch((error) => console.error("Error al agregar alumno:", error));
+  };
+
+  const handleEnviarAviso = () => {
+    const token = localStorage.getItem("token");
+    axios
+      .post(
+        "http://127.0.0.1:8000/api/teacher/subject/notice",
+        { message: mensajeAviso, subject: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then(() => {
+        alert("Aviso enviado con éxito");
+        setIsModalAvisoOpen(false);
+        setMensajeAviso("");
+      })
+      .catch((error) => console.error("Error al enviar aviso:", error));
   };
 
   return (
@@ -81,23 +97,73 @@ const DropdownOpcionesClase = () => {
       </button>
       <ul className={`dropdown-menu ${isDropdownOpen ? "show" : ""}`}>
         <li>
-          <a className="dropdown-item" href="#">
+          <button
+            className="dropdown-item"
+            onClick={() => setIsModalAvisoOpen(true)}
+          >
             Crear Aviso
-          </a>
+          </button>
         </li>
         <li>
-          <button className="dropdown-item" onClick={() => setIsModalOpen(true)}>
+          <button
+            className="dropdown-item"
+            onClick={() => setIsModalOpen(true)}
+          >
             Agregar Alumno
           </button>
         </li>
         <li>
-          <button className="dropdown-item" onClick={() => setIsModalAlumnosOpen(true)}>
+          <button
+            className="dropdown-item"
+            onClick={() => setIsModalAlumnosOpen(true)}
+          >
             Ver Alumnos Inscritos
           </button>
         </li>
       </ul>
 
-      {/* Modal para Agregar Alumno */}
+      {/* Modal Crear Aviso */}
+      {isModalAvisoOpen && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Crear Aviso</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setIsModalAvisoOpen(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <textarea
+                  className="form-control"
+                  placeholder="Escribe tu mensaje aquí"
+                  value={mensajeAviso}
+                  onChange={(e) => setMensajeAviso(e.target.value)}
+                  rows="4"
+                ></textarea>
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setIsModalAvisoOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleEnviarAviso}
+                >
+                  Enviar Aviso
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Agregar Alumno */}
       {isModalOpen && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog">
@@ -142,7 +208,7 @@ const DropdownOpcionesClase = () => {
         </div>
       )}
 
-      {/* Modal para Ver Alumnos Inscritos */}
+      {/* Modal Ver Alumnos Inscritos */}
       {isModalAlumnosOpen && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog">
