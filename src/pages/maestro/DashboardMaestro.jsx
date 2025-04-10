@@ -20,9 +20,9 @@ const DashboardMaestro = () => {
 
     const [recargarClases, setRecargarClases] = useState(false);
     const navigate = useNavigate();
-    const modalItems = { titulo: "Crear Clase" };
+    const modalTitle = "Crear Clase";
 
-    //recuperar clases
+    // recuperar clases
     useEffect(() => {
         const fetchClases = async () => {
             try {
@@ -178,7 +178,7 @@ const DashboardMaestro = () => {
     return (
         <Navbar actionButton={actionButton}>
             <Cards data={clases} onCardClick={onCardClick} />
-            <Modal modalItems={modalItems} formulario={formularioCrearClase} />
+            <Modal titulo={modalTitle} formulario={formularioCrearClase} />
         </Navbar>
     );
 };

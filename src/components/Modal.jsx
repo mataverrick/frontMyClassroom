@@ -1,6 +1,6 @@
 import React from "react";
 
-const Modal = ({ modalItems = {}, formulario }) => {
+const Modal = ({ titulo, formulario }) => {
     return (
         <div
             className="modal fade"
@@ -16,7 +16,7 @@ const Modal = ({ modalItems = {}, formulario }) => {
                             className="modal-title fs-5"
                             id="crearClaseModalLabel"
                         >
-                            {modalItems.titulo}
+                            {titulo}
                         </h1>
                     </div>
                     <div className="modal-body">

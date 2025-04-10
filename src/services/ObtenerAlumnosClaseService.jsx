@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const getAlumnos = async (id) => {
+export const getAlumnosClase = async (id) => {
     const token = localStorage.getItem("token");
     const endpoint = `http://127.0.0.1:8000/api/auth/subject/users/${id}`;
 

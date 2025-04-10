@@ -1,6 +1,8 @@
 import axios from "axios";
 
-export const obtenerAvisos = async (subjectId, token) => {
+export const getAvisos = async (subjectId) => {
+    const token = localStorage.getItem("token");
+    
     const response = await axios.get(
         `http://127.0.0.1:8000/api/auth/notices/${subjectId}`,
         {
