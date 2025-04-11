@@ -22,7 +22,6 @@ const TablonMaestro = () => {
   //valores reales para la peticion post de los forms
   const [users, setUsers] = useState(1);
   const [message, setMessage] = useState("");
-  const [prueba, setPrueba] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -35,7 +34,7 @@ const TablonMaestro = () => {
   const { id } = useParams();
 
   const navItems = [
-    { to: `/maestro/clase/${id}/tareas`, name: "Trabajo de clase" },
+    { to: `/maestro/clase/${id}/trabajo-de-clase`, name: "Trabajo de clase" },
   ];
 
   //obtener los temas de la clase

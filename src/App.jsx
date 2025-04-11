@@ -7,35 +7,45 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardMaestro from "./pages/maestro/DashboardMaestro";
 import TablonMaestro from "./pages/maestro/TablonMaestro";
+import TrabajoClaseMaestro from "./pages/maestro/TrabajoClaseMaestro";
 
 const App = () => {
-    return (
-        <BrowserRouter>
-            <AuthProvider>
-                <Routes>
-                    <Route path="/" element={<Login />}></Route>
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Login />}></Route>
 
-                    <Route
-                        path="/maestro/dashboard"
-                        element={
-                            <ProtectedRoute allowedRoles={[1]}>
-                                <DashboardMaestro />
-                            </ProtectedRoute>
-                        }
-                    ></Route>
+          <Route
+            path="/maestro/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={[1]}>
+                <DashboardMaestro />
+              </ProtectedRoute>
+            }
+          ></Route>
 
-                    <Route
-                        path="/maestro/clase/:id"
-                        element={
-                            <ProtectedRoute allowedRoles={[1]}>
-                                <TablonMaestro />
-                            </ProtectedRoute>
-                        }
-                    ></Route>
-                </Routes>
-            </AuthProvider>
-        </BrowserRouter>
-    );
+          <Route
+            path="/maestro/clase/:id"
+            element={
+              <ProtectedRoute allowedRoles={[1]}>
+                <TablonMaestro />
+              </ProtectedRoute>
+            }
+          ></Route>
+
+          <Route
+            path="/maestro/clase/:id/trabajo-de-clase"
+            element={
+              <ProtectedRoute allowedRoles={[1]}>
+                <TrabajoClaseMaestro />
+              </ProtectedRoute>
+            }
+          ></Route>
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
 };
 
 export default App;
