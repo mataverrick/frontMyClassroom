@@ -7,9 +7,9 @@ import { postAlumno } from "../../services/InscribirAlumnoService";
 import { getAlumnosClase } from "../../services/ObtenerAlumnosClaseService";
 import { getAvisos } from "../../services/ObtenerAvisosService";
 import { postAviso } from "../../services/CrearAvisoService";
+import { postTema } from "../../services/CrearTemaService";
+import { getTemas } from "../../services/ObtenerTemasService";
 import Avisos from "../../components/Avisos";
-
-// const navItems = [{ to: "/", name: "tareas" }] solo pa basarme xd
 
 const TablonMaestro = () => {
   const [formulario, setFormulario] = useState(null);
@@ -17,22 +17,35 @@ const TablonMaestro = () => {
   const [alumnos, setAlumnos] = useState([]);
   const [obtenerAlumnos, setObtenerAlumnos] = useState([]);
   const [avisos, setAvisos] = useState([]);
+  const [temas, setTemas] = useState([]);
 
   //valores reales para la peticion post de los forms
   const [users, setUsers] = useState(1);
   const [message, setMessage] = useState("");
   const [prueba, setPrueba] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   //valores pa recargar datos
   const [recargarAlumnos, setRecargarAlumnos] = useState(false);
   const [reacargarAvisos, setRecargarAvisos] = useState(false);
+  const [recargarTemas, setRecargarTemas] = useState(false);
+
+  //parametro de ruta
   const { id } = useParams();
 
   const navItems = [
     { to: `/maestro/clase/${id}/tareas`, name: "Trabajo de clase" },
-    { to: `/maestro/clase/${id}/temas`, name: "Temas" },
-    // {to: `/maestro/clase/${id}/material`, name: "Material" }
   ];
+
+  //obtener los temas de la clase
+  useEffect(() => {
+    const fetchTemas = async () => {
+      const response = await getTemas(id);
+      setTemas(response.data);
+    };
+    fetchTemas();
+  }, [recargarTemas]);
 
   //obtener alumnos de la clase
   useEffect(() => {
@@ -62,12 +75,32 @@ const TablonMaestro = () => {
     fetchAvisos();
   }, [reacargarAvisos]);
 
+  const enviarFormularioCrearTema = async (e) => {
+    e.preventDefault();
+
+    const data = {
+      name,
+      description,
+      subject: id,
+    };
+
+    try {
+      await postTema(data);
+      setName("");
+      setDescription("");
+      setRecargarTemas((prev) => !prev);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   const enviarFormularioInscribirAlumnos = async (e) => {
     e.preventDefault();
 
     try {
       //   console.log(users);
       await postAlumno(id, users);
+      setUsers(1);
       setRecargarAlumnos((prev) => !prev);
     } catch (error) {
       alert(error);
@@ -84,6 +117,7 @@ const TablonMaestro = () => {
 
     try {
       await postAviso(data);
+      setMessage("");
       setRecargarAvisos((prev) => !prev);
     } catch (error) {}
   };
@@ -163,10 +197,69 @@ const TablonMaestro = () => {
     </form>
   );
 
+  const formularioCrearTema = (
+    <form onSubmit={enviarFormularioCrearTema}>
+      <div className="mb-3">
+        <label htmlFor="name" className="form-label">
+          Nombre del tema
+        </label>
+        <input
+          id="name"
+          className="form-control"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+
+        <label htmlFor="name" className="form-label">
+          Descripcion
+        </label>
+        <input
+          id="description"
+          className="form-control"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
+      </div>
+      <div className="modal-footer">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cerrar
+        </button>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          data-bs-dismiss="modal"
+        >
+          Crear
+        </button>
+      </div>
+    </form>
+  );
+
   const verAlumnosModal = (
     <div className="mb-3">
       <ul className="list-group">
         {obtenerAlumnos.map((value) => (
+          <li
+            key={value.id}
+            className="list-group-item list-group-item-primary"
+          >
+            {value.name}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
+  const verTemasModal = (
+    <div className="mb-3">
+      <ul className="list-group">
+        {temas.map((value) => (
           <li
             key={value.id}
             className="list-group-item list-group-item-primary"
@@ -227,11 +320,41 @@ const TablonMaestro = () => {
             data-bs-toggle="modal"
             data-bs-target="#crearClaseModal"
             onClick={() => {
+              setFormulario("verTemas");
+              setTitle("Temas");
+            }}
+          >
+            Ver Temas
+          </button>
+        </li>
+
+        <li className="mb-1">
+          <button
+            type="button"
+            className="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#crearClaseModal"
+            onClick={() => {
               setFormulario("avisos");
               setTitle("Nuevo Aviso");
             }}
           >
             Agregar aviso
+          </button>
+        </li>
+
+        <li className="mb-1">
+          <button
+            type="button"
+            className="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#crearClaseModal"
+            onClick={() => {
+              setFormulario("crearTema");
+              setTitle("Nuevo Tema");
+            }}
+          >
+            Crear Tema
           </button>
         </li>
       </ul>
@@ -246,6 +369,10 @@ const TablonMaestro = () => {
         return verAlumnosModal;
       case "inscribirAlumno":
         return formularioInscribirAlumno;
+      case "crearTema":
+        return formularioCrearTema;
+      case "verTemas":
+        return verTemasModal;
     }
   };
 
