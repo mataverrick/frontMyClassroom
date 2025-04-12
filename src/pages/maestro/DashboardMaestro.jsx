@@ -165,7 +165,7 @@ const DashboardMaestro = () => {
                 <button
                     type="submit"
                     className="btn btn-primary"
-                    data-bs-dismiss="modal"
+                    // data-bs-dismiss="modal"
                 >
                     Crear
                 </button>

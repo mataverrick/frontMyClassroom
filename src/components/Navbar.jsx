@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 const Navbar = ({ children, navItems = [], actionButton }) => {
     const { logout } = useAuth();
     // navItems = [{ name: 1 }];
-
+    
     return (
         <>
             <nav className="navbar navbar-expand-lg bg-body-tertiary">

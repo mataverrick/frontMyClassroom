@@ -8,6 +8,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardMaestro from "./pages/maestro/DashboardMaestro";
 import TablonMaestro from "./pages/maestro/TablonMaestro";
 import TrabajoClaseMaestro from "./pages/maestro/TrabajoClaseMaestro";
+import ListadoTareasMaterialMaestro from "./pages/maestro/ListadoTareasMaterialMaestro";
 
 const App = () => {
   return (
@@ -39,6 +40,15 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={[1]}>
                 <TrabajoClaseMaestro />
+              </ProtectedRoute>
+            }
+          ></Route>
+
+          <Route
+            path="/maestro/clase/:id/trabajo-de-clase/tareas-material/:idTema"
+            element={
+              <ProtectedRoute allowedRoles={[1]}>
+                <ListadoTareasMaterialMaestro />
               </ProtectedRoute>
             }
           ></Route>
