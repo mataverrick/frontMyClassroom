@@ -4,9 +4,10 @@ import { useParams } from "react-router-dom";
 import { getTareasMaterial } from "../../services/ObtenerTareasMaterialService";
 import { postTarea } from "../../services/CrearTareaService";
 import Modal from "../../components/Modal";
+import { postMaterial } from "../../services/SubirMaterialSevice";
 
 const ListadoTareasMaterialMaestro = () => {
-  const { idTema } = useParams();
+  const { idTema, id } = useParams();
   const [modal, setModal] = useState("");
   const [titulo, setTitulo] = useState("");
 
@@ -15,8 +16,13 @@ const ListadoTareasMaterialMaestro = () => {
   const [description, setDescription] = useState("");
   const [limit, setLimit] = useState("");
 
+  //formulario subir material
+  const [titleMaterial, setTitleMaterial] = useState("");
+  const [descriptionMaterial, setDescriptionMaterial] = useState("");
+
   //recargar datos banderas
   const [recargarTareas, setRecargarTareas] = useState(false);
+  const [recargarMaterial, setRecargarMaterial] = useState(false);
 
   //recargar tareas
   useEffect(() => {
@@ -26,6 +32,7 @@ const ListadoTareasMaterialMaestro = () => {
     };
     fetchTareasMaterial();
   }, [recargarTareas]);
+
 
   const formatearFecha = (fecha) => {
     const date = new Date(fecha);
@@ -62,13 +69,81 @@ const ListadoTareasMaterialMaestro = () => {
     }
   };
 
+  const enviarFormularioMaterial = async (e) => {
+    e.preventDefault();
+    const data = {
+      title: titleMaterial,
+      description: descriptionMaterial,
+      topic: idTema,
+      subject: id,
+    };
+
+    try {
+      await postMaterial(data);
+      setRecargarTareas((prev)=> !prev);
+      setDescriptionMaterial("");
+      setTitleMaterial("");
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const formularioMaterial = (
+    <form onSubmit={enviarFormularioMaterial}>
+      <div className="mb-3">
+        <label htmlFor="titleMaterial" className="form-label">
+          Titulo
+        </label>
+        <input
+          id="titleMaterial"
+          type="text"
+          value={titleMaterial}
+          className="form-control"
+          onChange={(e) => {
+            setTitleMaterial(e.target.value);
+          }}
+          required
+        ></input>
+
+        <label htmlFor="description" className="form-label">
+          Descripcion
+        </label>
+        <input
+          id="description"
+          type="text"
+          value={descriptionMaterial}
+          className="form-control"
+          onChange={(e) => {
+            setDescriptionMaterial(e.target.value);
+          }}
+          required
+        ></input>
+      </div>
+      <div className="modal-footer">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cerrar
+        </button>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          // data-bs-dismiss="modal"
+        >
+          Enviar
+        </button>
+      </div>
+    </form>
+  );
+
   const formularioCrearTarea = (
     <form onSubmit={enviarFormularioTarea}>
       <div className="mb-3">
         <label htmlFor="title" className="form-label">
           Titulo de la tarea
         </label>
-
         <input
           id="title"
           type="text"
@@ -83,7 +158,6 @@ const ListadoTareasMaterialMaestro = () => {
         <label htmlFor="description" className="form-label">
           Descripcion
         </label>
-
         <input
           id="description"
           type="text"
@@ -151,6 +225,22 @@ const ListadoTareasMaterialMaestro = () => {
             Crear Tarea
           </button>
         </li>
+
+        <li className="mb-1">
+          <button
+            type="button"
+            className="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#crearClaseModal"
+            onClick={() => {
+              setModal("subirMaterial");
+              setTitulo("Crear Tarea");
+            }}
+          >
+            {" "}
+            Subir Material
+          </button>
+        </li>
       </ul>
     </div>
   );
@@ -159,6 +249,8 @@ const ListadoTareasMaterialMaestro = () => {
     switch (modal) {
       case "crearTarea":
         return formularioCrearTarea;
+      case "subirMaterial":
+        return formularioMaterial;
     }
   };
 
