@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getTemas } from "../../services/ObtenerTemasService";
 import { postTarea } from "../../services/CrearTareaService";
 import { getTareasMaterial } from "../../services/ObtenerTareasMaterialService";
+import { postTema } from "../../services/CrearTemaService";
 
 const TrabajoClaseMaestro = () => {
   const [titulo, setTitulo] = useState("");
@@ -18,11 +19,14 @@ const TrabajoClaseMaestro = () => {
   const [topic, setTopic] = useState(0);
   const [limit, setLimit] = useState("");
 
+  //formulario crear tema
+  const [name, setName] = useState("");
+  const [descriptionTema, setDescriptionTema] = useState("");
+  const [recargarTemas, setRecargarTemas] = useState(false);
+
   const { id } = useParams();
   const navItems = [{ to: `/maestro/clase/${id}`, name: "Regresar" }];
   const navigate = useNavigate();
-
-  // eta vaina va dentro de el listado de los temas
 
   //obtener los temas de la clase
   useEffect(() => {
@@ -32,104 +36,52 @@ const TrabajoClaseMaestro = () => {
       setTemas(response.data);
     };
     fetchTemas();
-  }, []);
+  }, [recargarTemas]);
 
-  const formatearFecha = (fecha) => {
-    const date = new Date(fecha);
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-
-    // Formato: YYYY-MM-DD HH:mm
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-  };
-
-  const enviarFormularioTarea = async (e) => {
+  const enviarFormularioCrearTema = async (e) => {
     e.preventDefault();
 
-    const newFormat = formatearFecha(limit);
-
     const data = {
-      title,
-      description,
-      topic,
+      name,
+      description:descriptionTema,
       subject: id,
-      limit: newFormat,
     };
 
     try {
-      await postTarea(data);
-      alert("Tarea agregada con exito");
+      await postTema(data);
+      setName("");
+      setDescriptionTema("");
+      setRecargarTemas((prev) => !prev);
     } catch (error) {
       alert(error);
     }
   };
 
-  const formularioCrearTarea = (
-    <form onSubmit={enviarFormularioTarea}>
+  const formularioCrearTema = (
+    <form onSubmit={enviarFormularioCrearTema}>
       <div className="mb-3">
-        <label htmlFor="title" className="form-label">
-          Titulo de la tarea
+        <label htmlFor="name" className="form-label">
+          Nombre del tema
         </label>
-
         <input
-          id="title"
-          type="text"
-          value={title}
+          id="name"
           className="form-control"
-          onChange={(e) => {
-            setTitle(e.target.value);
-          }}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
-        ></input>
+        />
 
-        <label htmlFor="description" className="form-label">
+        <label htmlFor="name" className="form-label">
           Descripcion
         </label>
-
         <input
           id="description"
-          type="text"
-          value={description}
           className="form-control"
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
+          value={descriptionTema}
+          onChange={(e) => setDescriptionTema(e.target.value)}
           required
-        ></input>
-
-        <label htmlFor="tema" className="form-label">
-          Tema
-        </label>
-        <select
-          id="tema"
-          className="form-select"
-          value={topic}
-          onChange={(e) => {
-            setTopic(e.target.value);
-          }}
-        >
-          <option value="">--Seleccione una opcion--</option>
-          {temas.map((value) => (
-            <option key={value.id} value={value.id}>
-              {value.name}
-            </option>
-          ))}
-        </select>
-
-        <label htmlFor="limit" className="form-label">
-          Fecha limite
-        </label>
-        <input
-          id="limit"
-          type="datetime-local"
-          className="form-control"
-          value={limit}
-          onChange={(e) => setLimit(e.target.value)}
-        ></input>
+        />
       </div>
       <div className="modal-footer">
         <button
@@ -169,11 +121,11 @@ const TrabajoClaseMaestro = () => {
             data-bs-toggle="modal"
             data-bs-target="#crearClaseModal"
             onClick={() => {
-              setModal("crearTarea");
-              setTitulo("Crear Tarea");
+              setModal("crearTema");
+              setTitulo("Crear Tema");
             }}
           >
-            Crear Tarea
+            Crear Tema
           </button>
         </li>
       </ul>
@@ -182,8 +134,8 @@ const TrabajoClaseMaestro = () => {
 
   const renderModal = () => {
     switch (modal) {
-      case "crearTarea":
-        return formularioCrearTarea;
+      case "crearTema":
+        return formularioCrearTema;
     }
   };
 
