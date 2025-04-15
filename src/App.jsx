@@ -9,6 +9,7 @@ import DashboardMaestro from "./pages/maestro/DashboardMaestro";
 import TablonMaestro from "./pages/maestro/TablonMaestro";
 import TrabajoClaseMaestro from "./pages/maestro/TrabajoClaseMaestro";
 import ListadoTareasMaterialMaestro from "./pages/maestro/ListadoTareasMaterialMaestro";
+import ClaseDetalleMaestro from "./pages/maestro/ClaseDetalleMaestro";
 
 /**
  * Imports alumnos
@@ -37,7 +38,7 @@ const App = () => {
             path="/maestro/clase/:id"
             element={
               <ProtectedRoute allowedRoles={[1]}>
-                <TablonMaestro />
+                <ClaseDetalleMaestro />
               </ProtectedRoute>
             }
           ></Route>

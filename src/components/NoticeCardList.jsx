@@ -16,6 +16,25 @@ const NoticeCardList = ({ notices }) => {
                             <p className="card-text text-muted">
                                 Fecha: {new Date(notice.date).toLocaleDateString()}
                             </p>
+                            {/* Renderizar archivos si existen */}
+                            {notice.files && notice.files.length > 0 && (
+                                <div className="mt-3">
+                                    <h6>Archivos:</h6>
+                                    <div className="d-flex flex-wrap gap-2">
+                                        {notice.files.map((file) => (
+                                            <a
+                                                key={file.id}
+                                                href={file.path}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn btn-outline-primary btn-sm"
+                                            >
+                                                {file.originalName}
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}

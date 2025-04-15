@@ -53,7 +53,7 @@ const DashboardMaestro = () => {
 
     //pa cuado le picas a una card te mande a la clase
     const onCardClick = (id) => {
-        navigate(`/maestro/clase/${id}`);
+        navigate(`/maestro/clase/${id}`); // Redirige a la vista de detalle de la clase
     };
 
     /**
