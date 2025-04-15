@@ -16,7 +16,7 @@ const TablonMaestro = () => {
   const [obtenerAlumnos, setObtenerAlumnos] = useState([]);
   const [avisos, setAvisos] = useState([]);
   const [files, setFiles] = useState([]);
-
+  
   //valores reales para la peticion post de los forms
   const [users, setUsers] = useState(1);
   const [message, setMessage] = useState("");

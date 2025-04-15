@@ -5,6 +5,7 @@ import { getTareasMaterial } from "../../services/ObtenerTareasMaterialService";
 import { postTarea } from "../../services/CrearTareaService";
 import Modal from "../../components/Modal";
 import { postMaterial } from "../../services/SubirMaterialSevice";
+import axios from "axios";
 
 const ListadoTareasMaterialMaestro = () => {
   const { idTema, id } = useParams();
@@ -19,6 +20,7 @@ const ListadoTareasMaterialMaestro = () => {
   //formulario subir material
   const [titleMaterial, setTitleMaterial] = useState("");
   const [descriptionMaterial, setDescriptionMaterial] = useState("");
+  const [filesMaterial, setMaterial] = useState([]);
 
   //recargar datos banderas
   const [recargarTareas, setRecargarTareas] = useState(false);
@@ -32,7 +34,6 @@ const ListadoTareasMaterialMaestro = () => {
     };
     fetchTareasMaterial();
   }, [recargarTareas]);
-
 
   const formatearFecha = (fecha) => {
     const date = new Date(fecha);
@@ -71,20 +72,44 @@ const ListadoTareasMaterialMaestro = () => {
 
   const enviarFormularioMaterial = async (e) => {
     e.preventDefault();
-    const data = {
-      title: titleMaterial,
-      description: descriptionMaterial,
-      topic: idTema,
-      subject: id,
-    };
+
+    const formData = new FormData();
+    formData.append("data[title]", titleMaterial);
+    formData.append("data[description]", descriptionMaterial);
+    formData.append("data[topic]", idTema);
+    formData.append("data[subject]", id);
+
+    // Solo si estás enviando archivos, agrega esto:
+    if (filesMaterial.length > 0) {
+      Array.from(filesMaterial).forEach((file) => {
+        formData.append("files[]", file);
+      });
+    }
 
     try {
-      await postMaterial(data);
-      setRecargarTareas((prev)=> !prev);
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/teacher/subject/resource",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setRecargarTareas((prev) => !prev);
       setDescriptionMaterial("");
+      setMaterial([])
       setTitleMaterial("");
     } catch (error) {
-      alert(error);
+      console.error("Error al enviar material:", error);
+      alert(
+        error.response?.data?.message ||
+          "Error desconocido al enviar el material"
+      );
     }
   };
 
@@ -119,6 +144,14 @@ const ListadoTareasMaterialMaestro = () => {
           required
         ></input>
       </div>
+
+      {/* pa subir archivos */}
+      <input
+        id="filesMaterial"
+        type="file"
+        onChange={(e) => setMaterial(e.target.files[0])}
+      />
+
       <div className="modal-footer">
         <button
           type="button"
