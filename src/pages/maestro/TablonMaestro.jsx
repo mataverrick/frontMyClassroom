@@ -55,8 +55,8 @@ const TablonMaestro = () => {
   useEffect(() => {
     const fetchAvisos = async () => {
       const response = await getAvisos(id);
-      setAvisos(response);
-      //   console.log(response);
+      setAvisos(response.notices);
+      console.log(response);
     };
     fetchAvisos();
   }, [reacargarAvisos]);
