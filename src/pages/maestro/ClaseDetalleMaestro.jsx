@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar";
 import { getNoticesByClassId } from "../../services/NoticesService";
 import NoticeCardList from "../../components/NoticeCardList";
 import axios from "axios";
+import NavbarClase from "../../components/NavbarClase";
 
 const ClaseDetalleMaestro = () => {
     const { id } = useParams(); // Obtiene el ID de la clase desde la URL
@@ -103,6 +104,7 @@ const ClaseDetalleMaestro = () => {
     return (
         <div>
             <Navbar />
+            <NavbarClase classId={id}/>
             <div className="container mt-4">
                 <button
                     className="btn btn-primary mb-4"
