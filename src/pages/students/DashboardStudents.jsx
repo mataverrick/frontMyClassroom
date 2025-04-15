@@ -32,7 +32,7 @@ const DashboardStudent = () => {
     }, [recargarClases]);
 
     const onCardClick = (id) => {
-        navigate(`/maestro/clase/${id}`);
+        navigate(`/clase/${id}`); // Redirige a la vista de detalle de la clase
     };
 
     return (

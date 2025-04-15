@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import { AuthProvider } from "./context/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,16 +10,16 @@ import TablonMaestro from "./pages/maestro/TablonMaestro";
 import TrabajoClaseMaestro from "./pages/maestro/TrabajoClaseMaestro";
 import ListadoTareasMaterialMaestro from "./pages/maestro/ListadoTareasMaterialMaestro";
 
-
 /**
  * Imports alumnos
  */
 import DashboardStudent from "./pages/students/DashboardStudents";
-
+import Pendientes from "./pages/students/Pendientes";
+import ClaseDetalle from "./pages/students/ClaseDetalle";
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Login />}></Route>
@@ -73,9 +73,19 @@ const App = () => {
             }
           ></Route>
 
+          <Route
+            path="/alumno/pendientes"
+            element={
+              <ProtectedRoute allowedRoles={[2]}>
+                <Pendientes />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/clase/:id" element={<ClaseDetalle />} />
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </Router>
   );
 };
 
