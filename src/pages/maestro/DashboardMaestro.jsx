@@ -56,6 +56,9 @@ const DashboardMaestro = () => {
         navigate(`/maestro/clase/${id}`);
     };
 
+    /**
+     * Funcion para enviar formulario de creacion de clase
+     */
     const enviarFormulario = async (e) => {
         e.preventDefault();
 
@@ -89,8 +92,7 @@ const DashboardMaestro = () => {
             + Crear Clase
         </button>
     );
-
-    //pal modal loco
+    
     const formularioCrearClase = (
         <form onSubmit={enviarFormulario}>
             <div className="mb-3">

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const endpoint = "http://127.0.0.1:8000/api/auth/subject/users/2";
+const endpoint = "http://127.0.0.1:8000/api/auth/user/2";
 
 export const getAlumnos = async () => {
     const token = localStorage.getItem("token");
@@ -11,7 +11,7 @@ export const getAlumnos = async () => {
         headers: { Authorization: `Bearer ${token}` },
     });
 
-    // console.log(response.data)
+    console.log(response.data)
 
-    return response.data.users;
+    return response.data;
 };

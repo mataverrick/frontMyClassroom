@@ -52,6 +52,12 @@ export const AuthProvider = ({ children }) => {
         checkAuth(); // Verifica si el usuario ya está autenticado al cargar la aplicación
     }, []);
 
+
+    /**
+     * Aqui se inicia la sesión.
+     * con endpointLogin
+     * 
+     */
     const handleLogin = async (email, password) => {
         try {
             const response = await axios.post(endpointLogin, {
@@ -65,6 +71,10 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+
+    /**
+     * Aqui se consiguen los datos del usuario
+     */
     const getUserData = async (token) => {
         try {
             const response = await axios.post(
@@ -82,6 +92,7 @@ export const AuthProvider = ({ children }) => {
 
             setAuthData({ token, role });
 
+            //aqui decide a que vista va
             if (role === 1) {
                 navigate("/maestro/dashboard");
             } else if (role === 2) {

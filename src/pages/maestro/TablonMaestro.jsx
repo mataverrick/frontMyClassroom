@@ -45,6 +45,7 @@ const TablonMaestro = () => {
     const fetchAlumnos = async () => {
       const response = await getAlumnos();
       setAlumnos(response);
+      console.log(alumnos);
     };
     fetchAlumnos();
   }, []);

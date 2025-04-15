@@ -10,6 +10,13 @@ import TablonMaestro from "./pages/maestro/TablonMaestro";
 import TrabajoClaseMaestro from "./pages/maestro/TrabajoClaseMaestro";
 import ListadoTareasMaterialMaestro from "./pages/maestro/ListadoTareasMaterialMaestro";
 
+
+/**
+ * Imports alumnos
+ */
+import DashboardStudent from "./pages/students/DashboardStudents";
+
+
 const App = () => {
   return (
     <BrowserRouter>
@@ -52,6 +59,20 @@ const App = () => {
               </ProtectedRoute>
             }
           ></Route>
+
+          /*
+            Apartir de aqui comienzan las rutas para alumnos 
+           */
+
+          <Route
+            path="/alumno/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={[2]}>
+                <DashboardStudent />
+              </ProtectedRoute>
+            }
+          ></Route>
+
         </Routes>
       </AuthProvider>
     </BrowserRouter>
