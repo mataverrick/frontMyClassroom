@@ -100,6 +100,44 @@ const ClaseDetalleMaestro = () => {
         }
     };
 
+    const handleSendStudents = async () => {
+        if (selectedStudents.length === 0) {
+            alert("Debe seleccionar al menos un alumno.");
+            return;
+        }
+
+        const data = {
+            subject: id,
+            users: selectedStudents.map((student) => student.id),
+        };
+
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("No se encontró un token de autenticación.");
+                return;
+            }
+
+            const response = await axios.post(
+                "http://127.0.0.1:8000/api/teacher/subject/users",
+                data,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            alert("Alumnos agregados exitosamente.");
+            setShowStudentForm(false); // Oculta el formulario
+            setSelectedStudents([]); // Limpia la lista de alumnos seleccionados
+        } catch (error) {
+            console.error("Error al enviar los alumnos:", error);
+            alert("Ocurrió un error al agregar los alumnos.");
+        }
+    };
+
     const handleCreateNotice = async () => {
         if (!message.trim()) {
             alert("El mensaje del aviso es obligatorio.");
@@ -271,7 +309,7 @@ const ClaseDetalleMaestro = () => {
                                 <button
                                     type="button"
                                     className="btn btn-primary"
-                                    onClick={() => alert("Funcionalidad pendiente")}
+                                    onClick={handleSendStudents}
                                 >
                                     Enviar
                                 </button>
