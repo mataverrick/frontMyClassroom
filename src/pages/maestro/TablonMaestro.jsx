@@ -15,6 +15,7 @@ const TablonMaestro = () => {
   const [alumnos, setAlumnos] = useState([]);
   const [obtenerAlumnos, setObtenerAlumnos] = useState([]);
   const [avisos, setAvisos] = useState([]);
+  const [files, setFiles] = useState([]);
 
   //valores reales para la peticion post de los forms
   const [users, setUsers] = useState(1);
@@ -76,25 +77,32 @@ const TablonMaestro = () => {
   const enviarFormularioAvisos = async (e) => {
     e.preventDefault();
 
-    const data = {
-      message,
-      subject: id,
-    };
+    const formData = new FormData();
+    formData.append("data[message]", message);
+    formData.append("data[subject]", id);
+
+    if (files.length > 0) {
+      Array.from(files).forEach((file) => {
+        formData.append("files[]", file);
+      });
+    }
 
     try {
-      await postAviso(data);
+      await postAviso(formData); 
       setMessage("");
+      setFiles([]); 
       setRecargarAvisos((prev) => !prev);
-    } catch (error) {}
+    } catch (error) {
+      alert(error);
+    }
   };
 
   const formularioNuevoAviso = (
-    <form onSubmit={enviarFormularioAvisos}>
+    <form onSubmit={enviarFormularioAvisos} encType="multipart/form-data">
       <div className="mb-3">
         <label htmlFor="message" className="form-label">
           Mensaje del aviso
         </label>
-
         <input
           id="message"
           type="text"
@@ -104,8 +112,24 @@ const TablonMaestro = () => {
             setMessage(e.target.value);
           }}
           required
-        ></input>
+        />
       </div>
+
+      <div className="mb-3">
+        <label htmlFor="fileUpload" className="form-label">
+          Adjuntar archivos
+        </label>
+        <input
+          id="fileUpload"
+          type="file"
+          className="form-control"
+          multiple
+          onChange={(e) => {
+            setFiles(e.target.files);
+          }}
+        />
+      </div>
+
       <div className="modal-footer">
         <button
           type="button"
@@ -114,11 +138,7 @@ const TablonMaestro = () => {
         >
           Cerrar
         </button>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          // data-bs-dismiss="modal"
-        >
+        <button type="submit" className="btn btn-primary">
           Crear
         </button>
       </div>

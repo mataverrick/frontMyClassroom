@@ -9,6 +9,7 @@ export const postAviso = async (avisoData) => {
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
       },
     }
   );
