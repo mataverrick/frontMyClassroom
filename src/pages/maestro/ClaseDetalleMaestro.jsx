@@ -10,9 +10,14 @@ const ClaseDetalleMaestro = () => {
     const { id } = useParams(); // Obtiene el ID de la clase desde la URL
     const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false); // Estado para mostrar/ocultar el formulario
+    const [showForm, setShowForm] = useState(false); // Estado para mostrar/ocultar el formulario de avisos
+    const [showStudentForm, setShowStudentForm] = useState(false); // Estado para mostrar/ocultar el formulario de alumnos
     const [message, setMessage] = useState(""); // Estado para el mensaje del aviso
     const [files, setFiles] = useState([]); // Estado para los archivos
+    const [studentName, setStudentName] = useState(""); // Estado para el nombre del alumno
+    const [searchResults, setSearchResults] = useState([]); // Resultados de búsqueda de usuarios
+    const [selectedStudents, setSelectedStudents] = useState([]); // Lista de alumnos seleccionados
+    const [typingTimeout, setTypingTimeout] = useState(null); // Control del retraso al escribir
 
     useEffect(() => {
         const fetchNotices = async () => {
@@ -38,9 +43,61 @@ const ClaseDetalleMaestro = () => {
     };
 
     const handleCancel = () => {
-        setShowForm(false); // Oculta el formulario
+        setShowForm(false); // Oculta el formulario de avisos
         setMessage(""); // Limpia el mensaje
         setFiles([]); // Limpia los archivos
+    };
+
+    const handleCancelStudentForm = () => {
+        setShowStudentForm(false); // Oculta el formulario de alumnos
+        setStudentName(""); // Limpia el campo de texto
+        setSearchResults([]); // Limpia los resultados de búsqueda
+    };
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setStudentName(value);
+
+        if (typingTimeout) {
+            clearTimeout(typingTimeout);
+        }
+
+        setTypingTimeout(
+            setTimeout(async () => {
+                if (value.trim() === "") {
+                    setSearchResults([]);
+                    return;
+                }
+
+                try {
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                        alert("No se encontró un token de autenticación.");
+                        return;
+                    }
+
+                    const response = await axios.get(
+                        `http://127.0.0.1:8000/api/auth/users/search/${value}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+
+                    setSearchResults(response.data.users || []);
+                } catch (error) {
+                    console.error("Error al buscar usuarios:", error);
+                }
+            }, 500) // Retraso de 500ms
+        );
+    };
+
+    const handleAddStudent = (user, event) => {
+        event.preventDefault(); // Evita que el botón recargue la página
+        if (!selectedStudents.some((student) => student.id === user.id)) {
+            setSelectedStudents([...selectedStudents, { id: user.id, name: user.name }]);
+        }
     };
 
     const handleCreateNotice = async () => {
@@ -76,25 +133,15 @@ const ClaseDetalleMaestro = () => {
                     },
                 }
             );
+
             alert("Aviso creado exitosamente.");
+            setShowForm(false); // Oculta el formulario
+            setMessage(""); // Limpia el mensaje
+            setFiles([]); // Limpia los archivos
 
-            try {
-                const response = await getNoticesByClassId(id);
-                if (response) {
-                    setNotices(response); // Asegúrate de que `response.notices` existe
-                    setShowForm(false); // Oculta el formulario
-                    setMessage(""); // Limpia el mensaje
-                    setFiles([]); // Limpia los archivos
-                } else {
-                    setNotices([]); // Si no hay datos, establece un array vacío
-                }
-            } catch (error) {
-                alert("Error al cargar los avisos");
-            } finally {
-                setLoading(false);
-            }
-
-            // Agrega el nuevo aviso a la lista
+            // Actualiza la lista de avisos
+            const updatedNotices = await getNoticesByClassId(id);
+            setNotices(updatedNotices);
         } catch (error) {
             console.error("Error al crear el aviso:", error);
             alert("Ocurrió un error al crear el aviso.");
@@ -104,7 +151,14 @@ const ClaseDetalleMaestro = () => {
     return (
         <div>
             <Navbar />
-            <NavbarClase classId={id}/>
+            <NavbarClase classId={id}>
+                <button
+                    className="btn btn-outline-success ms-auto"
+                    onClick={() => setShowStudentForm(true)}
+                >
+                    + Agregar Alumnos
+                </button>
+            </NavbarClase>
             <div className="container mt-4">
                 <button
                     className="btn btn-primary mb-4"
@@ -155,6 +209,71 @@ const ClaseDetalleMaestro = () => {
                                     onClick={handleCreateNotice}
                                 >
                                     Crear
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+
+                {showStudentForm && (
+                    <div className="card p-4 mb-4">
+                        <h3>Agregar Alumnos</h3>
+                        <form>
+                            <div className="mb-3">
+                                <label htmlFor="studentName" className="form-label">
+                                    Buscar Alumno
+                                </label>
+                                <input
+                                    id="studentName"
+                                    type="text"
+                                    className="form-control"
+                                    value={studentName}
+                                    onChange={handleSearchChange}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <h5>Resultados de búsqueda:</h5>
+                                <ul className="list-group">
+                                    {searchResults.map((user) => (
+                                        <li
+                                            key={user.id}
+                                            className="list-group-item d-flex justify-content-between align-items-center"
+                                        >
+                                            {user.name}
+                                            <button
+                                                className="btn btn-sm btn-primary"
+                                                onClick={(event) => handleAddStudent(user, event)}
+                                            >
+                                                Agregar
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="mb-3">
+                                <h5>Alumnos seleccionados:</h5>
+                                <ul className="list-group">
+                                    {selectedStudents.map((student) => (
+                                        <li key={student.id} className="list-group-item">
+                                            {student.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="d-flex justify-content-end">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary me-2"
+                                    onClick={handleCancelStudentForm}
+                                >
+                                    Cerrar
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={() => alert("Funcionalidad pendiente")}
+                                >
+                                    Enviar
                                 </button>
                             </div>
                         </form>
