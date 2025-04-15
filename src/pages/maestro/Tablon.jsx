@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import NavbarClase from "../../components/NavbarClase";
 import Navbar from "../../components/Navbar";
@@ -9,6 +9,40 @@ const Tablon = () => {
     const [showForm, setShowForm] = useState(false); // Estado para mostrar/ocultar el formulario
     const [name, setName] = useState(""); // Estado para el nombre del tema
     const [description, setDescription] = useState(""); // Estado para la descripción del tema
+    const [topics, setTopics] = useState([]); // Estado para almacenar los temas
+    const [loading, setLoading] = useState(true); // Estado para mostrar el estado de carga
+
+    // Función para recuperar los temas desde el backend
+    const fetchTopics = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("No se encontró un token de autenticación.");
+                return;
+            }
+
+            const response = await axios.get(
+                `http://127.0.0.1:8000/api/auth/subject/topics/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setTopics(response.data.data); // Actualiza el estado con los temas
+            console.log(response);
+        } catch (error) {
+            console.error("Error al recuperar los temas:", error);
+            alert("Ocurrió un error al cargar los temas.");
+        } finally {
+            setLoading(false); // Finaliza el estado de carga
+        }
+    };
+
+    useEffect(() => {
+        fetchTopics(); // Llama a la función para recuperar los temas al cargar el componente
+    }, [id]);
 
     const handleCancel = () => {
         setShowForm(false); // Oculta el formulario
@@ -27,7 +61,7 @@ const Tablon = () => {
             description: description.trim() || null, // Si no hay descripción, envía `null`
             subject: id, // El ID de la clase se obtiene de la URL
         };
-        console.log("Datos del tema:", topicData);
+
         try {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -50,7 +84,7 @@ const Tablon = () => {
             setShowForm(false); // Oculta el formulario
             setName(""); // Limpia el nombre
             setDescription(""); // Limpia la descripción
-            console.log("Respuesta del servidor:", response.data);
+            fetchTopics(); // Actualiza la lista de temas después de crear uno nuevo
         } catch (error) {
             console.error("Error al crear el tema:", error);
             alert("Ocurrió un error al crear el tema.");
@@ -70,7 +104,18 @@ const Tablon = () => {
             </NavbarClase>
             <div className="container mt-4">
                 <h3>Tablón</h3>
-                <p>Esta sección está vacía por el momento.</p>
+                {loading ? (
+                    <p>Cargando temas...</p>
+                ) : topics.length > 0 ? (
+                    topics.map((topic) => (
+                        <div key={topic.id}>
+                            <h5>{topic.name}</h5>
+                            <hr />
+                        </div>
+                    ))
+                ) : (
+                    <p>No hay temas disponibles.</p>
+                )}
 
                 {showForm && (
                     <div className="card p-4 mt-4">
