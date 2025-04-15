@@ -7,6 +7,7 @@ export const postTarea = async (data) => {
   const response = await axios.post(endpoint, data, {
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
     },
   });
 

@@ -6,6 +6,7 @@ import { postTarea } from "../../services/CrearTareaService";
 import Modal from "../../components/Modal";
 import { postMaterial } from "../../services/SubirMaterialSevice";
 import axios from "axios";
+import Tareas from "../../components/Tareas";
 
 const ListadoTareasMaterialMaestro = () => {
   const { idTema, id } = useParams();
@@ -21,19 +22,25 @@ const ListadoTareasMaterialMaestro = () => {
   const [titleMaterial, setTitleMaterial] = useState("");
   const [descriptionMaterial, setDescriptionMaterial] = useState("");
   const [filesMaterial, setMaterial] = useState([]);
+  const [filesTarea, setTarea] = useState([]);
 
   //recargar datos banderas
   const [recargarTareas, setRecargarTareas] = useState(false);
   const [recargarMaterial, setRecargarMaterial] = useState(false);
 
+  const [datos, setDatos] = useState([]);
+
   //recargar tareas
   useEffect(() => {
     const fetchTareasMaterial = async () => {
       const response = await getTareasMaterial(idTema);
-      console.log(response);
+      // console.log(response);
+      setDatos(response);
     };
     fetchTareasMaterial();
   }, [recargarTareas]);
+
+
 
   const formatearFecha = (fecha) => {
     const date = new Date(fecha);
@@ -53,22 +60,30 @@ const ListadoTareasMaterialMaestro = () => {
 
     const newFormat = formatearFecha(limit);
 
-    const data = {
-      title,
-      description,
-      topic: idTema,
-      subject: idTema,
-      limit: newFormat,
-    };
+    const formData = new FormData();
+    formData.append("data[title]", title);
+    formData.append("data[description]", description);
+    formData.append("data[topic]", idTema);
+    formData.append("data[subject]", idTema);
+    formData.append("data[limit]", newFormat);
+
+    // Solo si estás enviando archivos, agrega esto:
+    if (filesTarea.length > 0) {
+      Array.from(filesTarea).forEach((file) => {
+        formData.append("files[]", file);
+      });
+    }
 
     try {
-      await postTarea(data);
+      await postTarea(formData);
       setRecargarTareas((prev) => !prev);
-      alert("Tarea agregada con exito");
+      alert("Tarea agregada con éxito");
     } catch (error) {
       alert(error);
     }
   };
+
+  
 
   const enviarFormularioMaterial = async (e) => {
     e.preventDefault();
@@ -102,7 +117,7 @@ const ListadoTareasMaterialMaestro = () => {
 
       setRecargarTareas((prev) => !prev);
       setDescriptionMaterial("");
-      setMaterial([])
+      setMaterial([]);
       setTitleMaterial("");
     } catch (error) {
       console.error("Error al enviar material:", error);
@@ -212,6 +227,13 @@ const ListadoTareasMaterialMaestro = () => {
           value={limit}
           onChange={(e) => setLimit(e.target.value)}
         ></input>
+
+        {/* pa subir archivos */}
+        <input
+          id="filesTarea"
+          type="file"
+          onChange={(e) => setTarea(e.target.files[0])}
+        />
       </div>
       <div className="modal-footer">
         <button
@@ -290,6 +312,7 @@ const ListadoTareasMaterialMaestro = () => {
   return (
     <Navbar actionButton={dropdown}>
       <Modal titulo={titulo} formulario={renderModal()} />
+      <Tareas tareas={datos} />
     </Navbar>
   );
 };
