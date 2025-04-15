@@ -109,7 +109,15 @@ const Tablon = () => {
                 ) : topics.length > 0 ? (
                     topics.map((topic) => (
                         <div key={topic.id}>
-                            <h5>{topic.name}</h5>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h5>{topic.name}</h5>
+                                <button
+                                    className="btn btn-outline-primary btn-sm"
+                                    onClick={() => alert(`Agregar material para el tema: ${topic.name}`)}
+                                >
+                                    + Agregar Material
+                                </button>
+                            </div>
                             <hr />
                         </div>
                     ))
